@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiranjeet Loves Nilima</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            cursor: url('heart-cursor.png'), auto;
+            transition: background 0.5s ease;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px #000;
+            margin: 10px;
+            text-align: center;
+        }
+
+        p {
+            color: white;
+            font-size: 1.5em;
+            margin: 10px;
+            text-shadow: 1px 1px 2px #000;
+            text-align: center;
+        }
+
+        .photo-frame {
+            border: 10px solid white;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.7);
+            overflow: hidden;
+            width: 300px;
+            height: 400px;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(255, 105, 180, 0.7); }
+            to { box-shadow: 0 0 40px rgba(255, 20, 147, 1); }
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .heart, .petal {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            background: red;
+            transform: rotate(-45deg);
+            animation: float 5s infinite;
+        }
+
+        .heart::before, .heart::after, .petal::before, .petal::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            background: red;
+            border-radius: 50%;
+        }
+
+        .heart::before, .petal::before {
+            top: -10px;
+            left: 0;
+        }
+
+        .heart::after, .petal::after {
+            left: 10px;
+            top: 0;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(-45deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0; }
+        }
+
+        #password-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 10;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        button {
+            background: pink;
+            cursor: pointer;
+        }
+
+        #music-btn, #dark-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .quote, .poem {
+            margin-top: 20px;
+            color: white;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px #000;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Password Screen -->
+    <div id="password-screen">
+        <h2>Enter Password</h2>
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="checkPassword()">Submit</button>
+        <p id="error" style="color: red; display: none;">Wrong password. Try again!</p>
+    </div>
+
+    <!-- Love Content -->
+    <div id="love-content" style="display: none;">
+        <h1 id="heading"></h1>
+        <p>Forever and Always ❤️</p>
+
+        <!-- Timer -->
+        <p id="timer"></p>
+
+        <!-- Quotes -->
+        <div class="quote" id="quote"></div>
+
+        <!-- Slideshow -->
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <div class="photo-frame">
+                <img id="slideshow" src="CHIRA MANDU 1.jpeg" alt="Photo">
+            </div>
+        </div>
+
+        <!-- Poem -->
+        <div class="poem">
+            Roses are red,<br>
+            Violets are blue,<br>
+            My heart beats,<br>
+            Only for you. ❤️
+        </div>
+
+        <!-- Music and Dark Mode -->
+        <button id="music-btn" onclick="toggleMusic()">Pause Music 🎶</button>
+        <button id="dark-btn" onclick="toggleDarkMode()">Toggle Dark Mode 🌙</button>
+    </div>
+
+    <!-- Audio -->
+    <audio id="love-music" loop>
+        <source src="Music.mp3" type="audio/mp3">
+        Your browser does not support the audio tag.
+    </audio>
+
+    <script>
+        let musicPlaying = true;
+        let darkMode = false;
+
+        // Password check with confetti
+        function checkPassword() {
+            const passwordInput = document.getElementById('password').value;
+            if (passwordInput === "Chira") {
+                document.getElementById('password-screen').style.display = 'none';
+                document.getElementById('love-content').style.display = 'block';
+                startHearts();
+                startPetals();
+                startTypewriter();
+                startQuotes();
+                startSlideshow();
+                startTimer();
+                playMusic();
+                showConfetti();
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        function showConfetti() {
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'heart';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = Math.random() * 100 + 'vh';
+                confetti.style.background = '#' + Math.floor(Math.random()*16777215).toString(16);
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        // Floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = 3 + Math.random() * 2 + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+
+        function startHearts() {
+            setInterval(createHeart, 300);
+        }
+
+        // Falling petals
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animationDuration = 5 + Math.random() * 3 + 's';
+            petal.style.background = 'pink';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 7000);
+        }
+
+        function startPetals() {
+            setInterval(createPetal, 500);
+        }
+
+        // Typewriter
+        function startTypewriter() {
+            const text = "Chiranjeet Loves Nilima";
+            let i = 0;
+            const heading = document.getElementById('heading');
+            heading.innerHTML = '';
+            function typing() {
+                if (i < text.length) {
+                    heading.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typing, 100);
+                }
+            }
+            typing();
+        }
+
+        // Quotes Rotator
+        const quotes = [
+            "You are my today and all of my tomorrows.",
+            "In your smile, I see something more beautiful than the stars.",
+            "Forever is not long enough with you.",
+            "My heart is perfect because you are inside."
+        ];
+        let quoteIndex = 0;
+
+        function startQuotes() {
+            const quoteBox = document.getElementById('quote');
+            function showNextQuote() {
+                quoteBox.innerText = quotes[quoteIndex];
+                quoteIndex = (quoteIndex + 1) % quotes.length;
+            }
+            showNextQuote();
+            setInterval(showNextQuote, 3000);
+        }
+
+        // Slideshow
+        const photos = ["CHIRA MANDU 1.jpeg", "Chira photo.jpeg", "Chira mandu.jpeg"];
+        let photoIndex = 0;
+
+        function startSlideshow() {
+            const img = document.getElementById('slideshow');
+            function nextPhoto() {
+                img.src = photos[photoIndex];
+                photoIndex = (photoIndex + 1) % photos.length;
+            }
+            setInterval(nextPhoto, 3000);
+        }
+
+        // Timer
+        function startTimer() {
+            const timer = document.getElementById('timer');
+            const startDate = new Date("2020-02-02");
+            function updateTimer() {
+                const now = new Date();
+                const diff = now - startDate;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                timer.innerText = `Loving Nilima since 2 Feb 2020 — ${days} days, ${hours} hrs, ${minutes} mins`;
+            }
+            updateTimer();
+            setInterval(updateTimer, 60000);
+        }
+
+        // Music
+        const music = document.getElementById('love-music');
+        function playMusic() { music.play(); }
+        function toggleMusic() {
+            if (musicPlaying) {
+                music.pause();
+                document.getElementById('music-btn').innerText = "Play Music 🎶";
+            } else {
+                music.play();
+                document.getElementById('music-btn').innerText = "Pause Music 🎶";
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        // Dark Mode
+        function toggleDarkMode() {
+            document.body.style.background = darkMode ? "linear-gradient(to right, #ff9a9e, #fad0c4)" : "#1a1a1a";
+            darkMode = !darkMode;
+        }
+
+    </script>
+
+</body>
+</html>
